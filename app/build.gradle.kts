@@ -88,9 +88,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     // Room
-    implementation("androidx.room:room-runtime:2.5.2")
+    implementation("androidx.room:room-runtime:2.7.1")
     kapt(libs.hilt.android.compiler)
-    implementation("androidx.room:room-ktx:2.5.2")
+    implementation("androidx.room:room-ktx:2.7.1")
 
     // Testler
     testImplementation(libs.junit)
