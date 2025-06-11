@@ -1,7 +1,7 @@
 package com.eylembilecik.track_watcher.network
 
 import com.eylembilecik.track_watcher.BuildConfig
-import com.eylembilecik.track_watcher.model.MovieResponse
+import com.eylembilecik.track_watcher.data.model.MovieResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 
