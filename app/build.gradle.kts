@@ -76,6 +76,8 @@ dependencies {
     //Hilt
     implementation("com.google.dagger:hilt-android:2.51")
     kapt("com.google.dagger:hilt-compiler:2.51")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+
 
 
 
@@ -91,6 +93,9 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     kapt(libs.hilt.android.compiler)
     implementation("androidx.room:room-ktx:2.6.1")
+
+    //Coil
+    implementation("io.coil-kt:coil-compose:2.5.0")
 
     // Testler
     testImplementation(libs.junit)
