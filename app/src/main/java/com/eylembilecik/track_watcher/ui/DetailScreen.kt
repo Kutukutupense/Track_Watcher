@@ -11,12 +11,18 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.eylembilecik.track_watcher.viewmodel.MovieViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.eylembilecik.track_watcher.data.local.FavoriteMovie
+
 
 @Composable
 fun DetailScreen(
     movieId: String,
     viewModel: MovieViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.getPopularMovies()
+    }
+
     val movieResponse = viewModel.movieList.collectAsState().value
     val movie = movieResponse?.results?.find { it.id.toString() == movieId }
 
@@ -25,6 +31,14 @@ fun DetailScreen(
             Text("Movie not found.")
         }
         return
+    }
+
+    var isFavorite by remember { mutableStateOf(false) }
+
+    LaunchedEffect(movie.id) {
+        viewModel.isFavorite(movie.id) {
+            isFavorite = it
+        }
     }
 
     Column(
@@ -47,5 +61,29 @@ fun DetailScreen(
         Text(text = "Rating: ${movie.voteAverage}")
         Spacer(modifier = Modifier.height(16.dp))
         Text(text = movie.overview)
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Button(
+            onClick = {
+                val favorite = FavoriteMovie(
+                    id = movie.id,
+                    title = movie.title,
+                    posterPath = movie.posterPath,
+                    voteAverage = movie.voteAverage,
+                    overview = movie.overview,
+                    releaseDate = movie.releaseDate
+                )
+                if (isFavorite) {
+                    viewModel.removeFromFavorites(favorite)
+                } else {
+                    viewModel.addToFavorites(favorite)
+                }
+                isFavorite = !isFavorite
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(if (isFavorite) "Delete From Favorites" else "Add To Favorites")
+        }
     }
 }

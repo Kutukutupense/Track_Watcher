@@ -8,6 +8,7 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("dagger.hilt.android.plugin")
     kotlin("kapt")
+    id ("kotlin-parcelize")
 }
 
 
@@ -66,6 +67,9 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    kapt("androidx.room:room-compiler:2.6.1")
+
 
     // ViewModel Compose
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
