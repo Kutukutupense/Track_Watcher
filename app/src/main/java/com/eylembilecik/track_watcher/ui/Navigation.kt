@@ -23,12 +23,15 @@ fun Navigation(
             FavoritesScreen()
         }
         composable(BottomNavItem.Search.route) {
-            SearchScreen()
+            SearchScreen(navController)
         }
         composable("details/{movieId}") { backStackEntry ->
             val movieId = backStackEntry.arguments?.getString("movieId")
             DetailScreen(movieId = movieId ?: "")
         }
+
+
+
     }
 }
 

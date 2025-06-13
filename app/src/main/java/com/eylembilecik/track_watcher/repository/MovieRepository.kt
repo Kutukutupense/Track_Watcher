@@ -15,4 +15,9 @@ class MovieRepository @Inject constructor(
     suspend fun getMovieDetail(movieId: Int): Movie {
         return apiService.getMovieDetail(movieId = movieId)
     }
+
+    suspend fun searchMovies(query: String): MovieResponse {
+        return apiService.searchMovies(query = query)
+    }
+
 }

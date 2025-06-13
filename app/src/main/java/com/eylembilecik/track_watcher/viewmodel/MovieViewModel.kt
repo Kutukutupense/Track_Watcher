@@ -6,6 +6,7 @@ import com.eylembilecik.track_watcher.data.model.MovieResponse
 import com.eylembilecik.track_watcher.data.repository.MovieRepository
 import com.eylembilecik.track_watcher.data.repository.FavoriteMovieRepository
 import com.eylembilecik.track_watcher.data.local.FavoriteMovie
+import com.eylembilecik.track_watcher.data.model.Movie
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -53,4 +54,20 @@ class MovieViewModel @Inject constructor(
             onResult(result)
         }
     }
+
+    private val _searchResults = MutableStateFlow<List<Movie>>(emptyList())
+    val searchResults: StateFlow<List<Movie>> = _searchResults.asStateFlow()
+
+    fun searchMovies(query: String) {
+        viewModelScope.launch {
+            try {
+                val response = movieRepository.searchMovies(query)
+                _searchResults.value = response.results
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _searchResults.value = emptyList()
+            }
+        }
+    }
+
 }

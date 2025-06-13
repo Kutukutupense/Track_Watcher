@@ -26,7 +26,12 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "TMDB_API_KEY", "\"${project.findProperty("TMDB_API_KEY") ?: ""}\"")
+        val tmdbApiKey: String = project.properties["TMDB_API_KEY"] as String
+
+        buildConfigField("String", "TMDB_API_KEY", "\"$tmdbApiKey\"")
+
+
+
 
 
 
