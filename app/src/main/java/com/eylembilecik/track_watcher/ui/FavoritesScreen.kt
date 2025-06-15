@@ -20,20 +20,34 @@ import com.eylembilecik.track_watcher.viewmodel.MovieViewModel
 @Composable
 fun FavoritesScreen(viewModel: MovieViewModel = hiltViewModel()) {
     val favoriteMovies by viewModel.favoriteMovies.collectAsState(initial = emptyList())
+    val isSeriesMode by viewModel.isSeriesMode.collectAsState()
+    val context = LocalContext.current
 
-    if (favoriteMovies.isEmpty()) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("You haven't added any favorite movies yet.")
-        }
-    } else {
-        LazyColumn(modifier = Modifier.padding(16.dp)) {
-            items(favoriteMovies) { movie ->
-                FavoriteMovieItem(
-                    movie = movie,
-                    onRemove = { viewModel.removeFromFavorites(movie) },
-                    onUpdate = { updatedMovie -> viewModel.updateFavorite(updatedMovie) }
-                )
-                Spacer(modifier = Modifier.height(16.dp))
+    val filteredFavorites = favoriteMovies.filter { it.isSeries == isSeriesMode }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        ContentToggle(
+            isSeriesMode = isSeriesMode,
+            onToggle = { viewModel.setSeriesMode(it) }
+        )
+
+        if (filteredFavorites.isEmpty()) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("You haven't added any ${if (isSeriesMode) "TV series" else "movies"} yet.")
+            }
+        } else {
+            LazyColumn(modifier = Modifier.padding(16.dp)) {
+                items(filteredFavorites) { movie ->
+                    FavoriteMovieItem(
+                        movie = movie,
+                        onRemove = { viewModel.removeFromFavorites(movie) },
+                        onUpdate = { updatedMovie ->
+                            viewModel.updateFavorite(updatedMovie)
+                            Toast.makeText(context, "Progress saved", Toast.LENGTH_SHORT).show()
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
         }
     }
@@ -45,8 +59,6 @@ fun FavoriteMovieItem(
     onRemove: () -> Unit,
     onUpdate: (FavoriteMovie) -> Unit
 ) {
-    val context = LocalContext.current
-
     var season by remember { mutableStateOf(TextFieldValue(movie.season.toString())) }
     var episode by remember { mutableStateOf(TextFieldValue(movie.episode.toString())) }
     var minute by remember { mutableStateOf(TextFieldValue(movie.minute.toString())) }
@@ -125,7 +137,6 @@ fun FavoriteMovieItem(
                             minute = minute.text.toIntOrNull() ?: 0
                         )
                         onUpdate(updatedMovie)
-                        Toast.makeText(context, "Saved..", Toast.LENGTH_SHORT).show()
                     },
                     modifier = Modifier.weight(1f)
                 ) {

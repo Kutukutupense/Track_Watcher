@@ -32,4 +32,11 @@ interface TmdbApiService {
         @Query("page") page: Int = 1
     ): MovieResponse
 
+    @GET("tv/popular")
+    suspend fun getPopularSeries(): MovieResponse
+
+    @GET("search/tv")
+    suspend fun searchSeries(@Query("query") query: String): MovieResponse
+
+
 }

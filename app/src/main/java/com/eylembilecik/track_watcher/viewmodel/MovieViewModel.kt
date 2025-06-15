@@ -29,6 +29,10 @@ class MovieViewModel @Inject constructor(
 
     val favoriteMovies: Flow<List<FavoriteMovie>> = favoriteRepository.getAllFavorites()
 
+    private val _isSeriesMode = MutableStateFlow(false)
+    val isSeriesMode: StateFlow<Boolean> = _isSeriesMode.asStateFlow()
+
+
     fun getPopularMovies() {
         viewModelScope.launch {
             try {
@@ -79,5 +83,41 @@ class MovieViewModel @Inject constructor(
             favoriteRepository.updateFavorite(movie)
         }
     }
+    fun setSeriesMode(isSeries: Boolean) {
+        _isSeriesMode.value = isSeries
+    }
+
+    fun getPopularContent() {
+        viewModelScope.launch {
+            try {
+                _movieList.value = if (_isSeriesMode.value) {
+                    movieRepository.getPopularSeries()
+                } else {
+                    movieRepository.getPopularMovies()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun searchContent(query: String) {
+        viewModelScope.launch {
+            try {
+                _searchResults.value = if (_isSeriesMode.value) {
+                    movieRepository.searchSeries(query).results
+                } else {
+                    movieRepository.searchMovies(query).results
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _searchResults.value = emptyList()
+            }
+        }
+    }
+
+
+
+
 
 }
