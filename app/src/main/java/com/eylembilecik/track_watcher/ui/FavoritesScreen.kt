@@ -26,7 +26,11 @@ fun FavoritesScreen(viewModel: MovieViewModel = hiltViewModel()) {
     } else {
         LazyColumn(modifier = Modifier.padding(16.dp)) {
             items(favoriteMovies) { movie ->
-                FavoriteMovieItem(movie = movie, onRemove = { viewModel.removeFromFavorites(movie) })
+                FavoriteMovieItem(
+                    movie = movie,
+                    onRemove = { viewModel.removeFromFavorites(movie) },
+                    onUpdate = { updatedMovie -> viewModel.updateFavorite(updatedMovie) }
+                )
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
@@ -34,14 +38,17 @@ fun FavoritesScreen(viewModel: MovieViewModel = hiltViewModel()) {
 }
 
 @Composable
-fun FavoriteMovieItem(movie: FavoriteMovie, onRemove: () -> Unit) {
+fun FavoriteMovieItem(
+    movie: FavoriteMovie,
+    onRemove: () -> Unit,
+    onUpdate: (FavoriteMovie) -> Unit
+) {
     var season by remember { mutableStateOf(TextFieldValue(movie.season.toString())) }
     var episode by remember { mutableStateOf(TextFieldValue(movie.episode.toString())) }
     var minute by remember { mutableStateOf(TextFieldValue(movie.minute.toString())) }
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -71,28 +78,54 @@ fun FavoriteMovieItem(movie: FavoriteMovie, onRemove: () -> Unit) {
                     value = season,
                     onValueChange = { season = it },
                     label = { Text("Season") },
-                    modifier = Modifier.weight(1f).padding(end = 4.dp)
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 4.dp)
                 )
                 OutlinedTextField(
                     value = episode,
                     onValueChange = { episode = it },
                     label = { Text("Episode") },
-                    modifier = Modifier.weight(1f).padding(horizontal = 4.dp)
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 4.dp)
                 )
                 OutlinedTextField(
                     value = minute,
                     onValueChange = { minute = it },
                     label = { Text("Minute") },
-                    modifier = Modifier.weight(1f).padding(start = 4.dp)
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 4.dp)
                 )
             }
 
             Spacer(modifier = Modifier.height(12.dp))
-            Button(
-                onClick = onRemove,
-                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error)
-            ) {
-                Text("Remove from Favorites")
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Button(
+                    onClick = onRemove,
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Remove")
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Button(
+                    onClick = {
+                        val updatedMovie = movie.copy(
+                            season = season.text.toIntOrNull() ?: 0,
+                            episode = episode.text.toIntOrNull() ?: 0,
+                            minute = minute.text.toIntOrNull() ?: 0
+                        )
+                        onUpdate(updatedMovie)
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Save Progress")
+                }
             }
         }
     }

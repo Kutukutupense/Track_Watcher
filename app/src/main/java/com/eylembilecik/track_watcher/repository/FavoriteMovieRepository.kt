@@ -25,4 +25,9 @@ class FavoriteMovieRepository @Inject constructor(
     suspend fun isFavorite(movieId: Int): Boolean {
         return favoriteMovieDao.isMovieFavorite(movieId)
     }
+
+    suspend fun updateFavorite(movie: FavoriteMovie) {
+        favoriteMovieDao.updateFavorite(movie)
+    }
+
 }

@@ -74,4 +74,10 @@ class MovieViewModel @Inject constructor(
             onResult(result)
         }
     }
+    fun updateFavorite(movie: FavoriteMovie) {
+        viewModelScope.launch {
+            favoriteRepository.updateFavorite(movie)
+        }
+    }
+
 }

@@ -15,9 +15,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.eylembilecik.track_watcher.viewmodel.MovieViewModel
+import com.eylembilecik.track_watcher.data.model.Movie
 
 @Composable
 fun PopularScreen(
@@ -38,11 +38,10 @@ fun PopularScreen(
         ) {
             items(response.results) { movie ->
                 MovieItem(
-                    title = movie.title,
-                    posterPath = movie.posterPath,
-                    voteAverage = movie.voteAverage,
+                    movie = movie,
                     onClick = {
-                        navController.navigate("details/${movie.id}")
+                        viewModel.selectMovie(movie)
+                        navController.navigate("details")
                     }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -55,13 +54,9 @@ fun PopularScreen(
     }
 }
 
-
-
 @Composable
 fun MovieItem(
-    title: String,
-    posterPath: String,
-    voteAverage: Double,
+    movie: Movie,
     onClick: () -> Unit
 ) {
     Card(
@@ -73,7 +68,7 @@ fun MovieItem(
     ) {
         Row(modifier = Modifier.padding(8.dp)) {
             Image(
-                painter = rememberAsyncImagePainter("https://image.tmdb.org/t/p/w500$posterPath"),
+                painter = rememberAsyncImagePainter("https://image.tmdb.org/t/p/w500${movie.posterPath}"),
                 contentDescription = null,
                 modifier = Modifier
                     .width(100.dp)
@@ -84,9 +79,9 @@ fun MovieItem(
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxHeight()
             ) {
-                Text(text = title, fontWeight = FontWeight.Bold)
+                Text(text = movie.title, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = "Score: $voteAverage")
+                Text(text = "Score: ${movie.voteAverage}")
             }
         }
     }
