@@ -12,10 +12,11 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.eylembilecik.track_watcher.viewmodel.MovieViewModel
 
+
 @Composable
 fun SearchScreen(
-    navController: NavHostController, // ← bunu ekledik
-    viewModel: MovieViewModel = hiltViewModel()
+    navController: NavHostController,
+    viewModel: MovieViewModel
 ) {
     var query by remember { mutableStateOf("") }
     val searchResults by viewModel.searchResults.collectAsState()
@@ -44,7 +45,8 @@ fun SearchScreen(
                     .fillMaxWidth()
                     .padding(vertical = 4.dp)
                     .clickable {
-                        navController.navigate("details/${movie.id}")
+                        viewModel.selectMovie(movie)
+                        navController.navigate("details")
                     },
                 elevation = CardDefaults.cardElevation(4.dp)
             ) {

@@ -12,33 +12,27 @@ import coil.compose.rememberAsyncImagePainter
 import com.eylembilecik.track_watcher.viewmodel.MovieViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.eylembilecik.track_watcher.data.local.FavoriteMovie
+import com.eylembilecik.track_watcher.data.model.Movie
 
 
 @Composable
-fun DetailScreen(
-    movieId: String,
-    viewModel: MovieViewModel = hiltViewModel()
-) {
-    LaunchedEffect(Unit) {
-        viewModel.getPopularMovies()
-    }
+fun DetailScreen(viewModel: MovieViewModel) {
+    val movie = viewModel.selectedMovie.collectAsState().value
+    var isFavorite by remember { mutableStateOf(false) }
 
-    val movieResponse = viewModel.movieList.collectAsState().value
-    val movie = movieResponse?.results?.find { it.id.toString() == movieId }
+    LaunchedEffect(movie?.id) {
+        movie?.let {
+            viewModel.isFavorite(it.id) { fav ->
+                isFavorite = fav
+            }
+        }
+    }
 
     if (movie == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("Movie not found.")
         }
         return
-    }
-
-    var isFavorite by remember { mutableStateOf(false) }
-
-    LaunchedEffect(movie.id) {
-        viewModel.isFavorite(movie.id) {
-            isFavorite = it
-        }
     }
 
     Column(

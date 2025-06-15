@@ -21,6 +21,14 @@ class MovieViewModel @Inject constructor(
     private val _movieList = MutableStateFlow<MovieResponse?>(null)
     val movieList: StateFlow<MovieResponse?> = _movieList.asStateFlow()
 
+    private val _searchResults = MutableStateFlow<List<Movie>>(emptyList())
+    val searchResults: StateFlow<List<Movie>> = _searchResults.asStateFlow()
+
+    private val _selectedMovie = MutableStateFlow<Movie?>(null)
+    val selectedMovie: StateFlow<Movie?> = _selectedMovie.asStateFlow()
+
+    val favoriteMovies: Flow<List<FavoriteMovie>> = favoriteRepository.getAllFavorites()
+
     fun getPopularMovies() {
         viewModelScope.launch {
             try {
@@ -32,9 +40,21 @@ class MovieViewModel @Inject constructor(
         }
     }
 
+    fun searchMovies(query: String) {
+        viewModelScope.launch {
+            try {
+                val response = movieRepository.searchMovies(query)
+                _searchResults.value = response.results
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _searchResults.value = emptyList()
+            }
+        }
+    }
 
-
-    val favoriteMovies: Flow<List<FavoriteMovie>> = favoriteRepository.getAllFavorites()
+    fun selectMovie(movie: Movie) {
+        _selectedMovie.value = movie
+    }
 
     fun addToFavorites(movie: FavoriteMovie) {
         viewModelScope.launch {
@@ -54,20 +74,4 @@ class MovieViewModel @Inject constructor(
             onResult(result)
         }
     }
-
-    private val _searchResults = MutableStateFlow<List<Movie>>(emptyList())
-    val searchResults: StateFlow<List<Movie>> = _searchResults.asStateFlow()
-
-    fun searchMovies(query: String) {
-        viewModelScope.launch {
-            try {
-                val response = movieRepository.searchMovies(query)
-                _searchResults.value = response.results
-            } catch (e: Exception) {
-                e.printStackTrace()
-                _searchResults.value = emptyList()
-            }
-        }
-    }
-
 }
