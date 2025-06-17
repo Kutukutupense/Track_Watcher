@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -18,6 +19,7 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.eylembilecik.track_watcher.viewmodel.MovieViewModel
 import com.eylembilecik.track_watcher.data.model.Movie
+import com.eylembilecik.track_watcher.ui.components.MovieItem
 
 @Composable
 fun PopularScreen(
@@ -25,63 +27,38 @@ fun PopularScreen(
     viewModel: MovieViewModel = hiltViewModel()
 ) {
     val movieResponse = viewModel.movieList.collectAsState().value
+    val isSeriesMode by viewModel.isSeriesMode.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.getPopularMovies()
+    LaunchedEffect(isSeriesMode) {
+        viewModel.getPopularContent()
     }
 
-    movieResponse?.let { response ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp)
-        ) {
-            items(response.results) { movie ->
-                MovieItem(
-                    movie = movie,
-                    onClick = {
-                        viewModel.selectMovie(movie)
-                        navController.navigate("details")
-                    }
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-        }
-    } ?: run {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(text = "Loading...")
-        }
-    }
-}
+    Column(modifier = Modifier.fillMaxSize()) {
+        ContentToggle(
+            isSeriesMode = isSeriesMode,
+            onToggle = { viewModel.setSeriesMode(it) }
+        )
 
-@Composable
-fun MovieItem(
-    movie: Movie,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(160.dp)
-            .clickable { onClick() },
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Row(modifier = Modifier.padding(8.dp)) {
-            Image(
-                painter = rememberAsyncImagePainter("https://image.tmdb.org/t/p/w500${movie.posterPath}"),
-                contentDescription = null,
+        movieResponse?.let { response ->
+            LazyColumn(
                 modifier = Modifier
-                    .width(100.dp)
-                    .height(144.dp)
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxHeight()
+                    .fillMaxSize()
+                    .padding(8.dp)
             ) {
-                Text(text = movie.title, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = "Score: ${movie.voteAverage}")
+                items(response.results) { movie ->
+                    MovieItem(
+                        movie = movie,
+                        onClick = {
+                            viewModel.selectMovie(movie)
+                            navController.navigate("details")
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+        } ?: run {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(text = "Loading...")
             }
         }
     }

@@ -26,6 +26,7 @@ fun FavoritesScreen(viewModel: MovieViewModel = hiltViewModel()) {
     val filteredFavorites = favoriteMovies.filter { it.isSeries == isSeriesMode }
 
     Column(modifier = Modifier.fillMaxSize()) {
+
         ContentToggle(
             isSeriesMode = isSeriesMode,
             onToggle = { viewModel.setSeriesMode(it) }

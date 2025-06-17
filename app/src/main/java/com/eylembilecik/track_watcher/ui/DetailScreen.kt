@@ -10,10 +10,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.eylembilecik.track_watcher.viewmodel.MovieViewModel
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.eylembilecik.track_watcher.data.local.FavoriteMovie
-import com.eylembilecik.track_watcher.data.model.Movie
-
 
 @Composable
 fun DetailScreen(viewModel: MovieViewModel) {
@@ -42,18 +39,30 @@ fun DetailScreen(viewModel: MovieViewModel) {
     ) {
         Image(
             painter = rememberAsyncImagePainter("https://image.tmdb.org/t/p/w500${movie.posterPath}"),
-            contentDescription = movie.title,
+            contentDescription = movie.title ?: movie.name ?: "Movie poster",
             modifier = Modifier
                 .fillMaxWidth()
                 .height(300.dp)
         )
+
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = movie.title, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+
+        Text(
+            text = movie.title ?: movie.name ?: "No title",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold
+        )
+
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "Release Date: ${movie.releaseDate}")
+
+        Text(text = "Release Date: ${movie.releaseDate ?: "Unknown"}")
+
         Spacer(modifier = Modifier.height(8.dp))
+
         Text(text = "Rating: ${movie.voteAverage}")
+
         Spacer(modifier = Modifier.height(16.dp))
+
         Text(text = movie.overview)
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -62,12 +71,17 @@ fun DetailScreen(viewModel: MovieViewModel) {
             onClick = {
                 val favorite = FavoriteMovie(
                     id = movie.id,
-                    title = movie.title,
+                    title = movie.title ?: movie.name ?: "No title",
                     posterPath = movie.posterPath,
                     voteAverage = movie.voteAverage,
                     overview = movie.overview,
-                    releaseDate = movie.releaseDate
+                    releaseDate = movie.releaseDate ?: "",
+                    season = 1,
+                    episode = 1,
+                    minute = 0,
+                    isSeries = false
                 )
+
                 if (isFavorite) {
                     viewModel.removeFromFavorites(favorite)
                 } else {
