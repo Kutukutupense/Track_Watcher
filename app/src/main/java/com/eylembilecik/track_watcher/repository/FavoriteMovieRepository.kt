@@ -10,23 +10,13 @@ import javax.inject.Singleton
 class FavoriteMovieRepository @Inject constructor(
     private val favoriteMovieDao: FavoriteMovieDao
 ) {
-    fun getAllFavorites(): Flow<List<FavoriteMovie>> {
-        return favoriteMovieDao.getAllFavorites()
-    }
+    fun getAllFavorites(): Flow<List<FavoriteMovie>> = favoriteMovieDao.getAllFavorites()
 
-    suspend fun addFavorite(movie: FavoriteMovie) {
-        favoriteMovieDao.insertFavorite(movie)
-    }
+    suspend fun addFavorite(movie: FavoriteMovie) = favoriteMovieDao.insertFavorite(movie)
 
-    suspend fun removeFavorite(movie: FavoriteMovie) {
-        favoriteMovieDao.deleteFavorite(movie)
-    }
+    suspend fun removeFavorite(movie: FavoriteMovie) = favoriteMovieDao.deleteFavorite(movie)
 
-    suspend fun isFavorite(movieId: Int): Boolean {
-        return favoriteMovieDao.isMovieFavorite(movieId)
-    }
+    suspend fun isFavorite(movieId: Int): Boolean = favoriteMovieDao.isMovieFavorite(movieId)
 
-    suspend fun updateFavorite(movie: FavoriteMovie) {
-        favoriteMovieDao.updateFavorite(movie)
-    }
+    suspend fun updateFavorite(movie: FavoriteMovie) = favoriteMovieDao.updateFavorite(movie)
 }

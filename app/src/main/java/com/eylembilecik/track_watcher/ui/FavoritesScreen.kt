@@ -24,12 +24,10 @@ fun FavoritesScreen(viewModel: MovieViewModel = hiltViewModel()) {
     val isSeriesMode by viewModel.isSeriesMode.collectAsState()
     val context = LocalContext.current
 
-    // Diziler veya filmler olarak filtrele
     val filteredFavorites = favoriteMovies.filter { it.isSeries == isSeriesMode }
 
     Column(modifier = Modifier.fillMaxSize()) {
 
-        // Filmler / Diziler toggle butonu
         ContentToggle(
             isSeriesMode = isSeriesMode,
             onToggle = { viewModel.setSeriesMode(it) }
@@ -44,7 +42,7 @@ fun FavoritesScreen(viewModel: MovieViewModel = hiltViewModel()) {
             }
         } else {
             LazyColumn(modifier = Modifier.padding(16.dp)) {
-                items(filteredFavorites) { movie ->
+                items(filteredFavorites, key = { it.id }) { movie ->  // key eklendi
                     FavoriteMovieItem(
                         movie = movie,
                         onRemove = { viewModel.removeFromFavorites(movie) },
@@ -66,9 +64,9 @@ fun FavoriteMovieItem(
     onRemove: () -> Unit,
     onUpdate: (FavoriteMovie) -> Unit
 ) {
-    var season by remember { mutableStateOf(TextFieldValue(movie.season.toString())) }
-    var episode by remember { mutableStateOf(TextFieldValue(movie.episode.toString())) }
-    var minute by remember { mutableStateOf(TextFieldValue(movie.minute.toString())) }
+    var season by remember(movie.id) { mutableStateOf(TextFieldValue(movie.season.toString())) }
+    var episode by remember(movie.id) { mutableStateOf(TextFieldValue(movie.episode.toString())) }
+    var minute by remember(movie.id) { mutableStateOf(TextFieldValue(movie.minute.toString())) }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -96,35 +94,40 @@ fun FavoriteMovieItem(
             Spacer(modifier = Modifier.height(12.dp))
             Text(text = "Where you left off:", style = MaterialTheme.typography.bodyMedium)
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                OutlinedTextField(
-                    value = season,
-                    onValueChange = { season = it },
-                    label = { Text("Season") },
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 4.dp),
-                    singleLine = true,
-                )
-                OutlinedTextField(
-                    value = episode,
-                    onValueChange = { episode = it },
-                    label = { Text("Episode") },
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 4.dp),
-                    singleLine = true,
-                )
-                OutlinedTextField(
-                    value = minute,
-                    onValueChange = { minute = it },
-                    label = { Text("Minute") },
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 4.dp),
-                    singleLine = true,
-                )
+            // Sadece dizi ise season ve episode göster
+            if (movie.isSeries) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    OutlinedTextField(
+                        value = season,
+                        onValueChange = { season = it },
+                        label = { Text("Season") },
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 4.dp),
+                        singleLine = true,
+                    )
+                    OutlinedTextField(
+                        value = episode,
+                        onValueChange = { episode = it },
+                        label = { Text("Episode") },
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 4.dp),
+                        singleLine = true,
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
             }
+
+
+            OutlinedTextField(
+                value = minute,
+                onValueChange = { minute = it },
+                label = { Text("Minute") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+            )
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -142,8 +145,8 @@ fun FavoriteMovieItem(
                 Button(
                     onClick = {
                         val updatedMovie = movie.copy(
-                            season = season.text.toIntOrNull() ?: 0,
-                            episode = episode.text.toIntOrNull() ?: 0,
+                            season = if (movie.isSeries) season.text.toIntOrNull() ?: 1 else 1,
+                            episode = if (movie.isSeries) episode.text.toIntOrNull() ?: 1 else 1,
                             minute = minute.text.toIntOrNull() ?: 0
                         )
                         onUpdate(updatedMovie)
@@ -156,3 +159,4 @@ fun FavoriteMovieItem(
         }
     }
 }
+

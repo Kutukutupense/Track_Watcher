@@ -20,6 +20,5 @@ interface FavoriteMovieDao {
 
     @Update
     suspend fun updateFavorite(movie: FavoriteMovie)
-
 }
 

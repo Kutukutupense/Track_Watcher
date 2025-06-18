@@ -30,7 +30,6 @@ class MovieViewModel @Inject constructor(
     private val _selectedMovie = MutableStateFlow<Movie?>(null)
     val selectedMovie: StateFlow<Movie?> = _selectedMovie
 
-    // Favorileri doğrudan Flow olarak veriyoruz
     val favoriteMovies: Flow<List<FavoriteMovie>> = favoriteMovieRepository.getAllFavorites()
 
     fun setSeriesMode(isSeries: Boolean) {
