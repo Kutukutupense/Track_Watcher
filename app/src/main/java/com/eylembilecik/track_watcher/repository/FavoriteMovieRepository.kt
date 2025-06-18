@@ -29,5 +29,4 @@ class FavoriteMovieRepository @Inject constructor(
     suspend fun updateFavorite(movie: FavoriteMovie) {
         favoriteMovieDao.updateFavorite(movie)
     }
-
 }

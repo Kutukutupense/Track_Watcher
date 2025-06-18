@@ -1,6 +1,5 @@
 package com.eylembilecik.track_watcher.data.repository
 
-import com.eylembilecik.track_watcher.data.model.Movie
 import com.eylembilecik.track_watcher.data.model.MovieResponse
 import com.eylembilecik.track_watcher.network.TmdbApiService
 import javax.inject.Inject
@@ -8,25 +7,8 @@ import javax.inject.Inject
 class MovieRepository @Inject constructor(
     private val apiService: TmdbApiService
 ) {
-    suspend fun getPopularMovies(): MovieResponse {
-        return apiService.getPopularMovies()
-    }
-
-    suspend fun getMovieDetail(movieId: Int): Movie {
-        return apiService.getMovieDetail(movieId = movieId)
-    }
-
-    suspend fun searchMovies(query: String): MovieResponse {
-        return apiService.searchMovies(query = query)
-    }
-
-    suspend fun getPopularSeries(): MovieResponse {
-        return apiService.getPopularSeries()
-    }
-
-    suspend fun searchSeries(query: String): MovieResponse {
-        return apiService.searchSeries(query)
-    }
-
-
+    suspend fun getPopularMovies(): MovieResponse = apiService.getPopularMovies()
+    suspend fun getPopularSeries(): MovieResponse = apiService.getPopularSeries()
+    suspend fun searchMovies(query: String): MovieResponse = apiService.searchMovies(query)
+    suspend fun searchSeries(query: String): MovieResponse = apiService.searchSeries(query)
 }

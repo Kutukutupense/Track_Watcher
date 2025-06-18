@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.eylembilecik.track_watcher.data.local.FavoriteMovie
+import com.eylembilecik.track_watcher.ui.components.ContentToggle
 import com.eylembilecik.track_watcher.viewmodel.MovieViewModel
 
 @Composable
@@ -23,10 +24,12 @@ fun FavoritesScreen(viewModel: MovieViewModel = hiltViewModel()) {
     val isSeriesMode by viewModel.isSeriesMode.collectAsState()
     val context = LocalContext.current
 
+    // Diziler veya filmler olarak filtrele
     val filteredFavorites = favoriteMovies.filter { it.isSeries == isSeriesMode }
 
     Column(modifier = Modifier.fillMaxSize()) {
 
+        // Filmler / Diziler toggle butonu
         ContentToggle(
             isSeriesMode = isSeriesMode,
             onToggle = { viewModel.setSeriesMode(it) }
@@ -34,7 +37,10 @@ fun FavoritesScreen(viewModel: MovieViewModel = hiltViewModel()) {
 
         if (filteredFavorites.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("You haven't added any ${if (isSeriesMode) "TV series" else "movies"} yet.")
+                Text(
+                    text = "You haven't added any ${if (isSeriesMode) "TV series" else "movies"} yet.",
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         } else {
             LazyColumn(modifier = Modifier.padding(16.dp)) {
@@ -97,7 +103,8 @@ fun FavoriteMovieItem(
                     label = { Text("Season") },
                     modifier = Modifier
                         .weight(1f)
-                        .padding(end = 4.dp)
+                        .padding(end = 4.dp),
+                    singleLine = true,
                 )
                 OutlinedTextField(
                     value = episode,
@@ -105,7 +112,8 @@ fun FavoriteMovieItem(
                     label = { Text("Episode") },
                     modifier = Modifier
                         .weight(1f)
-                        .padding(horizontal = 4.dp)
+                        .padding(horizontal = 4.dp),
+                    singleLine = true,
                 )
                 OutlinedTextField(
                     value = minute,
@@ -113,7 +121,8 @@ fun FavoriteMovieItem(
                     label = { Text("Minute") },
                     modifier = Modifier
                         .weight(1f)
-                        .padding(start = 4.dp)
+                        .padding(start = 4.dp),
+                    singleLine = true,
                 )
             }
 
@@ -122,7 +131,7 @@ fun FavoriteMovieItem(
             Row(modifier = Modifier.fillMaxWidth()) {
                 Button(
                     onClick = onRemove,
-                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                     modifier = Modifier.weight(1f)
                 ) {
                     Text("Remove")

@@ -1,9 +1,9 @@
-package com.eylembilecik.track_watcher.ui
+package com.eylembilecik.track_watcher.ui.components
 
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,15 +15,20 @@ fun ContentToggle(
     onToggle: (Boolean) -> Unit
 ) {
     Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(16.dp)
+        horizontalArrangement = Arrangement.Center
     ) {
-        Text("Movies")
+        Text(
+            text = if (isSeriesMode) "Series" else "Movies",
+            style = MaterialTheme.typography.titleMedium
+        )
+        Spacer(modifier = Modifier.width(8.dp))
         Switch(
             checked = isSeriesMode,
-            onCheckedChange = { onToggle(it) },
-            modifier = Modifier.padding(horizontal = 8.dp)
+            onCheckedChange = onToggle
         )
-        Text("TV Series")
     }
 }

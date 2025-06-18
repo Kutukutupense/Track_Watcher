@@ -9,9 +9,9 @@ data class WatchItem(
     val id: Int = 0,
 
     val title: String,
-    val isMovie: Boolean, // true = film, false = dizi
-    val season: Int?,     // film için null olabilir
-    val episode: Int?,    // film için null olabilir
-    val minute: Int?,     // kaldığın dakika
-    val isWatched: Boolean = false // izlendi mi
+    val isMovie: Boolean,
+    val season: Int?,
+    val episode: Int?,
+    val minute: Int?,
+    val isWatched: Boolean = false
 )
