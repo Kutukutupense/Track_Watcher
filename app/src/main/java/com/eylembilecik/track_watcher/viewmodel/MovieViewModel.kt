@@ -32,6 +32,25 @@ class MovieViewModel @Inject constructor(
 
     val favoriteMovies: Flow<List<FavoriteMovie>> = favoriteMovieRepository.getAllFavorites()
 
+
+    private val _searchFavoritesQuery = MutableStateFlow("")
+    val searchFavoritesQuery: StateFlow<String> = _searchFavoritesQuery
+
+
+    val filteredFavoriteMovies: Flow<List<FavoriteMovie>> = combine(
+        favoriteMovies,
+        isSeriesMode,
+        _searchFavoritesQuery
+    ) { favorites, isSeries, query ->
+        favorites
+            .filter { it.isSeries == isSeries }
+            .filter { it.title.contains(query, ignoreCase = true) }
+    }
+
+    fun setSearchFavoritesQuery(query: String) {
+        _searchFavoritesQuery.value = query
+    }
+
     fun setSeriesMode(isSeries: Boolean) {
         _isSeriesMode.value = isSeries
     }

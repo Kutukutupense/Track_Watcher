@@ -24,7 +24,11 @@ fun FavoritesScreen(viewModel: MovieViewModel = hiltViewModel()) {
     val isSeriesMode by viewModel.isSeriesMode.collectAsState()
     val context = LocalContext.current
 
-    val filteredFavorites = favoriteMovies.filter { it.isSeries == isSeriesMode }
+    var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
+
+    val filteredFavorites = favoriteMovies
+        .filter { it.isSeries == isSeriesMode }
+        .filter { it.title.contains(searchQuery.text, ignoreCase = true) }
 
     Column(modifier = Modifier.fillMaxSize()) {
 
@@ -33,16 +37,26 @@ fun FavoritesScreen(viewModel: MovieViewModel = hiltViewModel()) {
             onToggle = { viewModel.setSeriesMode(it) }
         )
 
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            label = { Text("Search favorites") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            singleLine = true
+        )
+
         if (filteredFavorites.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
-                    text = "You haven't added any ${if (isSeriesMode) "TV series" else "movies"} yet.",
+                    text = "No ${if (isSeriesMode) "TV series" else "movies"} found.",
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
         } else {
             LazyColumn(modifier = Modifier.padding(16.dp)) {
-                items(filteredFavorites, key = { it.id }) { movie ->  // key eklendi
+                items(filteredFavorites, key = { it.id }) { movie ->
                     FavoriteMovieItem(
                         movie = movie,
                         onRemove = { viewModel.removeFromFavorites(movie) },
@@ -94,7 +108,6 @@ fun FavoriteMovieItem(
             Spacer(modifier = Modifier.height(12.dp))
             Text(text = "Where you left off:", style = MaterialTheme.typography.bodyMedium)
 
-            // Sadece dizi ise season ve episode göster
             if (movie.isSeries) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     OutlinedTextField(
@@ -119,7 +132,6 @@ fun FavoriteMovieItem(
 
                 Spacer(modifier = Modifier.height(8.dp))
             }
-
 
             OutlinedTextField(
                 value = minute,
@@ -159,4 +171,3 @@ fun FavoriteMovieItem(
         }
     }
 }
-
