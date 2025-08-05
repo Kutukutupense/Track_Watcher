@@ -3,6 +3,8 @@ package com.eylembilecik.track_watcher.ui
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,10 +37,13 @@ fun DetailScreen(viewModel: MovieViewModel) {
         return
     }
 
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+            .verticalScroll(scrollState)
     ) {
         Image(
             painter = rememberAsyncImagePainter("https://image.tmdb.org/t/p/w500${movie.posterPath}"),
@@ -82,7 +87,7 @@ fun DetailScreen(viewModel: MovieViewModel) {
                     season = 1,
                     episode = 1,
                     minute = 0,
-                    isSeries = viewModel.isSeriesMode.value // toggle durumunu baz alıyoruz
+                    isSeries = viewModel.isSeriesMode.value
                 )
 
                 if (isFavorite) {
