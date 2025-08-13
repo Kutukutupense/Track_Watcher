@@ -21,6 +21,8 @@ fun PopularScreen(
 ) {
     val movieResponse by viewModel.movieList.collectAsState()
     val isSeriesMode by viewModel.isSeriesMode.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     LaunchedEffect(isSeriesMode) {
         viewModel.getPopularContent()
@@ -32,28 +34,49 @@ fun PopularScreen(
             onToggle = { viewModel.setSeriesMode(it) }
         )
 
-        movieResponse?.let { response ->
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(8.dp)
-            ) {
-                items(response.results) { movie ->
-                    MovieItem(
-                        movie = movie,
-                        onClick = {
-                            viewModel.selectMovie(movie)
-                            navController.navigate("details")
-                        }
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
+        when {
+            errorMessage != null -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = errorMessage ?: "Unknown error")
                 }
             }
-        } ?: Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = "Loading...")
+            isLoading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "Loading...")
+                }
+            }
+            movieResponse?.results.isNullOrEmpty() -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "No data available")
+                }
+            }
+            else -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp)
+                ) {
+                    items(movieResponse!!.results) { movie ->
+                        MovieItem(
+                            movie = movie,
+                            onClick = {
+                                viewModel.selectMovie(movie)
+                                navController.navigate("details")
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
+            }
         }
     }
 }

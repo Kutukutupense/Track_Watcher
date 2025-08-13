@@ -10,6 +10,8 @@ import com.eylembilecik.track_watcher.data.repository.MovieRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.io.IOException
+import retrofit2.HttpException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,12 +32,16 @@ class MovieViewModel @Inject constructor(
     private val _selectedMovie = MutableStateFlow<Movie?>(null)
     val selectedMovie: StateFlow<Movie?> = _selectedMovie
 
-    val favoriteMovies: Flow<List<FavoriteMovie>> = favoriteMovieRepository.getAllFavorites()
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    val favoriteMovies: Flow<List<FavoriteMovie>> = favoriteMovieRepository.getAllFavorites()
 
     private val _searchFavoritesQuery = MutableStateFlow("")
     val searchFavoritesQuery: StateFlow<String> = _searchFavoritesQuery
-
 
     val filteredFavoriteMovies: Flow<List<FavoriteMovie>> = combine(
         favoriteMovies,
@@ -57,20 +63,58 @@ class MovieViewModel @Inject constructor(
 
     fun getPopularContent() {
         viewModelScope.launch {
-            _movieList.value = if (_isSeriesMode.value) {
-                movieRepository.getPopularSeries()
-            } else {
-                movieRepository.getPopularMovies()
+            _isLoading.value = true
+            _errorMessage.value = null
+
+            try {
+                val response = if (_isSeriesMode.value) {
+                    movieRepository.getPopularSeries()
+                } else {
+                    movieRepository.getPopularMovies()
+                }
+
+                if (response != null) {
+                    _movieList.value = response
+                } else {
+                    _errorMessage.value = "No internet connection"
+                }
+            } catch (e: IOException) {
+                _errorMessage.value = "No internet connection"
+            } catch (e: HttpException) {
+                _errorMessage.value = "Server error: ${e.code()}"
+            } catch (e: Exception) {
+                _errorMessage.value = "Unexpected error"
+            } finally {
+                _isLoading.value = false
             }
         }
     }
 
     fun searchContent(query: String) {
         viewModelScope.launch {
-            _searchResults.value = if (_isSeriesMode.value) {
-                movieRepository.searchSeries(query).results
-            } else {
-                movieRepository.searchMovies(query).results
+            _isLoading.value = true
+            _errorMessage.value = null
+
+            try {
+                val response = if (_isSeriesMode.value) {
+                    movieRepository.searchSeries(query)
+                } else {
+                    movieRepository.searchMovies(query)
+                }
+
+                if (response != null) {
+                    _searchResults.value = response.results
+                } else {
+                    _errorMessage.value = "No internet connection"
+                }
+            } catch (e: IOException) {
+                _errorMessage.value = "No internet connection"
+            } catch (e: HttpException) {
+                _errorMessage.value = "Server error: ${e.code()}"
+            } catch (e: Exception) {
+                _errorMessage.value = "Unexpected error"
+            } finally {
+                _isLoading.value = false
             }
         }
     }
