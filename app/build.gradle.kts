@@ -21,8 +21,8 @@ android {
         applicationId = "com.eylembilecik.track_watcher"
         minSdk = 24
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.1"
+        versionCode = 8
+        versionName = "1.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
